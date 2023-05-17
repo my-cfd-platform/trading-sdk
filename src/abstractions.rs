@@ -7,6 +7,9 @@ pub trait ExecutionBidAsk {
     fn get_bid(&self) -> f64;
     fn get_ask(&self) -> f64;
     fn get_date(&self) -> u64;
+    fn get_base(&self) -> &str;
+    fn get_quote(&self) -> &str;
+    fn reverse(&self) -> Self;
 }
 
 pub trait ExecutionPositionBase {
