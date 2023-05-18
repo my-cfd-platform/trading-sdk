@@ -1,9 +1,8 @@
 use std::collections::HashSet;
 
 use crate::{
-    ActiveExecutionPosition, ActivePositionsStore, ExecutionBidAsk,
-    ExecutionClosePositionReason, ExecutionPositionBase, PositionsStoreIndex,
-    PositionsStoreIndexAccessor,
+    ActiveExecutionPosition, ActivePositionsStore, ExecutionBidAsk, ExecutionClosePositionReason,
+    ExecutionPositionBase, PositionsStoreIndex, PositionsStoreIndexAccessor,
 };
 
 pub struct ActivePositionsCache<T>

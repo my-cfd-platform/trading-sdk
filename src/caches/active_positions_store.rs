@@ -3,15 +3,16 @@ use std::collections::{BTreeMap, HashSet};
 use crate::{ActiveExecutionPosition, ExecutionPositionBase};
 
 pub trait PositionsStoreIndexAccessor {
-    fn get_account_index(&self) -> Option<&str>;
-    fn get_base_coll_index(&self) -> Option<&str>;
-    fn get_quote_coll_index(&self) -> Option<&str>;
-    fn get_instrument_index(&self) -> Option<&str>;
+    fn get_account_index(&self) -> Option<String>;
+    fn get_base_coll_index(&self) -> Option<String>;
+    fn get_quote_coll_index(&self) -> Option<String>;
+    fn get_instrument_index(&self) -> Option<String>;
 }
 
 pub struct PositionsStoreIndex {
     accounts_index: BTreeMap<String, HashSet<String>>,
     base_coll_index: BTreeMap<String, HashSet<String>>,
+    quote_coll_index: BTreeMap<String, HashSet<String>>,
     instruments_index: BTreeMap<String, HashSet<String>>,
 }
 
@@ -20,14 +21,14 @@ impl PositionsStoreIndex {
         Self {
             accounts_index: BTreeMap::new(),
             base_coll_index: BTreeMap::new(),
-            // quote_coll_index: BTreeMap::new(),
+            quote_coll_index: BTreeMap::new(),
             instruments_index: BTreeMap::new(),
         }
     }
 
     pub fn add<T: PositionsStoreIndexAccessor + ExecutionPositionBase>(&mut self, item: &T) {
         if let Some(account_id) = item.get_account_index() {
-            if let Some(accounts_index) = self.accounts_index.get_mut(account_id) {
+            if let Some(accounts_index) = self.accounts_index.get_mut(&account_id) {
                 accounts_index.insert(account_id.to_string());
             } else {
                 self.accounts_index.insert(
@@ -37,8 +38,19 @@ impl PositionsStoreIndex {
             }
         };
 
+        if let Some(quote_coll) = item.get_quote_coll_index() {
+            if let Some(quote_coll_index) = self.quote_coll_index.get_mut(&quote_coll) {
+                quote_coll_index.insert(item.get_id().to_string());
+            } else {
+                self.quote_coll_index.insert(
+                    quote_coll.to_string(),
+                    HashSet::from_iter(vec![item.get_id().to_string()]),
+                );
+            }
+        };
+
         if let Some(base_coll) = item.get_base_coll_index() {
-            if let Some(base_coll_index) = self.base_coll_index.get_mut(base_coll) {
+            if let Some(base_coll_index) = self.base_coll_index.get_mut(&base_coll) {
                 base_coll_index.insert(item.get_id().to_string());
             } else {
                 self.base_coll_index.insert(
@@ -49,7 +61,7 @@ impl PositionsStoreIndex {
         };
 
         if let Some(asset_pair) = item.get_instrument_index() {
-            if let Some(instruments_index) = self.instruments_index.get_mut(asset_pair) {
+            if let Some(instruments_index) = self.instruments_index.get_mut(&asset_pair) {
                 instruments_index.insert(item.get_id().to_string());
             } else {
                 self.instruments_index.insert(
@@ -63,25 +75,35 @@ impl PositionsStoreIndex {
     pub fn remove<T: PositionsStoreIndexAccessor + ExecutionPositionBase>(&mut self, item: &T) {
         if let Some(account_id) = item.get_account_index() {
             self.accounts_index
-                .get_mut(account_id)
+                .get_mut(&account_id)
                 .unwrap()
                 .remove(item.get_id());
         }
 
+        if let Some(quote_coll) = item.get_quote_coll_index() {
+            self.quote_coll_index
+                .get_mut(&quote_coll)
+                .unwrap()
+                .remove(item.get_id());
+        }
 
         if let Some(base_coll) = item.get_base_coll_index() {
             self.base_coll_index
-                .get_mut(base_coll)
+                .get_mut(&base_coll)
                 .unwrap()
                 .remove(item.get_id());
         }
 
         if let Some(asset_pair) = item.get_instrument_index() {
             self.instruments_index
-                .get_mut(asset_pair)
+                .get_mut(&asset_pair)
                 .unwrap()
                 .remove(item.get_id());
         }
+    }
+
+    pub fn get_quote_coll_positions(&self, currency: &str) -> Option<&HashSet<String>> {
+        self.quote_coll_index.get(currency)
     }
 
     pub fn get_base_coll_positions(&self, currency: &str) -> Option<&HashSet<String>> {
@@ -96,8 +118,10 @@ impl PositionsStoreIndex {
         self.instruments_index.get(asset_pair)
     }
 }
+// (pub BTreeMap<String, T>, pub PositionsStoreIndex)
 pub struct ActivePositionsStore<T>
 where
+    
     T: ExecutionPositionBase + ActiveExecutionPosition + PositionsStoreIndexAccessor + Clone,
 {
     pub positions: BTreeMap<String, T>,
