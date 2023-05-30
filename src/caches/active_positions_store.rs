@@ -9,6 +9,7 @@ pub trait PositionsStoreIndexAccessor {
     fn get_instrument_index(&self) -> Option<String>;
 }
 
+#[derive(Debug)]
 pub struct PositionsStoreIndex {
     accounts_index: BTreeMap<String, HashSet<String>>,
     base_coll_index: BTreeMap<String, HashSet<String>>,
@@ -29,7 +30,7 @@ impl PositionsStoreIndex {
     pub fn add<T: PositionsStoreIndexAccessor + ExecutionPositionBase>(&mut self, item: &T) {
         if let Some(account_id) = item.get_account_index() {
             if let Some(accounts_index) = self.accounts_index.get_mut(&account_id) {
-                accounts_index.insert(account_id.to_string());
+                accounts_index.insert(item.get_id().to_string());
             } else {
                 self.accounts_index.insert(
                     account_id.to_string(),
@@ -121,7 +122,6 @@ impl PositionsStoreIndex {
 // (pub BTreeMap<String, T>, pub PositionsStoreIndex)
 pub struct ActivePositionsStore<T>
 where
-    
     T: ExecutionPositionBase + ActiveExecutionPosition + PositionsStoreIndexAccessor + Clone,
 {
     pub positions: BTreeMap<String, T>,
@@ -207,5 +207,103 @@ where
         }
 
         return Some(result);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{PositionsStoreIndex, ExecutionPositionBase, PositionsStoreIndexAccessor};
+
+
+    pub struct TestIndex{
+        pub account: String,
+        pub id: String,
+        pub base: String,
+        pub quote: String,
+        pub asset_pair: String,
+    }
+
+    impl PositionsStoreIndexAccessor for TestIndex {
+        fn get_account_index(&self) -> Option<String> {
+            Some(self.account.clone())
+        }
+
+        fn get_base_coll_index(&self) -> Option<String> {
+            Some(self.base.clone())
+        }
+
+        fn get_quote_coll_index(&self) -> Option<String> {
+            Some(self.quote.clone())
+        }
+
+        fn get_instrument_index(&self) -> Option<String> {
+            Some(self.asset_pair.clone())
+        }
+    }
+
+    impl ExecutionPositionBase for TestIndex {
+        fn get_id(&self) -> &str {
+            &self.id
+        }
+
+        fn get_account_id(&self) -> &str {
+            todo!()
+        }
+
+        fn get_asset_pair(&self) -> &str {
+            todo!()
+        }
+
+        fn get_side(&self) -> &crate::PositionSide {
+            todo!()
+        }
+
+        fn get_invest_amount(&self) -> f64 {
+            todo!()
+        }
+
+        fn get_so_percent(&self) -> f64 {
+            todo!()
+        }
+
+        fn get_position_close_reason(&self) -> Option<crate::ExecutionClosePositionReason> {
+            todo!()
+        }
+    }
+
+    #[tokio::test]
+    async fn test_account_index() {
+        let indx = TestIndex {
+            account: "ac1".to_string(),
+            id: "id1".to_string(),
+            base: "test".to_string(),
+            quote: "test".to_string(),
+            asset_pair: "test".to_string(),
+        };
+
+        let indx2 = TestIndex {
+            account: "ac1".to_string(),
+            id: "id2".to_string(),
+            base: "test".to_string(),
+            quote: "test".to_string(),
+            asset_pair: "test".to_string(),
+        };
+
+        let mut indexses = PositionsStoreIndex::new();
+        indexses.add(&indx);
+        indexses.add(&indx2);
+
+        let account_positions = indexses.get_account_positions("ac1");
+
+        assert_eq!(true, account_positions.is_some());
+
+        let positions = account_positions.unwrap();
+        assert_eq!(2, positions.len());
+
+        let positions = positions.into_iter().collect::<Vec<&String>>();
+
+        assert_eq!("id1", positions[0]);
+        assert_eq!("id2", positions[1]);
+
     }
 }
