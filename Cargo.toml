@@ -1,0 +1,8 @@
+[workspace]
+
+members = [
+    "trading-sdk",
+    "trading-sdk-core",
+    "trading-sdk-abstractions",
+    "trading-sdk-mt-engine",
+]
