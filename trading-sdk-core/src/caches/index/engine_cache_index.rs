@@ -62,8 +62,6 @@ impl TradingCacheIndex {
     }
 
     pub fn query(&self, query: &EngineCacheQueryBuilder) -> HashSet<Arc<String>> {
-        let mut sw = Stopwatch::new();
-
         let mut sets = vec![];
 
         if let Some(base) = &query.base {
@@ -123,10 +121,6 @@ impl TradingCacheIndex {
         for set in to_search.iter_mut().skip(1) {
             result = result.intersection(set).cloned().collect();
         }
-
-        sw.stop();
-
-        println!("Query took: {:?} nanos", sw.elapsed().as_nanos());
         return result;
     }
 
