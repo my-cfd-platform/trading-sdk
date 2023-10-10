@@ -8,7 +8,6 @@ pub fn update_active_position_rate(
     {
         position.state.asset_active_price = get_close_price(new_bid_ask, &position.base_data.side);
         position.state.asset_active_bid_ask = new_bid_ask.clone();
-        return;
     }
 
     if position.base_data.quote == position.base_data.collateral {
@@ -21,7 +20,6 @@ pub fn update_active_position_rate(
         position.state.quote_collateral_active_price =
             get_close_price(new_bid_ask, &position.base_data.side);
         position.state.quote_collateral_active_bid_ask = Some(new_bid_ask.clone());
-        return;
     }
 
     if position.base_data.quote == new_bid_ask.quote
@@ -31,6 +29,5 @@ pub fn update_active_position_rate(
             get_close_price(new_bid_ask, &position.base_data.side)
                 / get_open_price(new_bid_ask, &position.base_data.side);
         position.state.quote_collateral_active_bid_ask = Some(new_bid_ask.clone());
-        return;
     }
 }
