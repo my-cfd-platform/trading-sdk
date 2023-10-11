@@ -121,7 +121,7 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        let mut active_state = MtPositionActiveState {
+        let active_state = MtPositionActiveState {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,
@@ -195,7 +195,7 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        let mut active_state = MtPositionActiveState {
+        let active_state = MtPositionActiveState {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,
@@ -268,7 +268,7 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        let mut active_state = MtPositionActiveState {
+        let active_state = MtPositionActiveState {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,
@@ -342,7 +342,7 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        let mut active_state = MtPositionActiveState {
+        let active_state = MtPositionActiveState {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,
@@ -415,7 +415,7 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        let mut active_state = MtPositionActiveState {
+        let active_state = MtPositionActiveState {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,

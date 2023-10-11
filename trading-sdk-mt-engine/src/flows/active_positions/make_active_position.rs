@@ -62,7 +62,7 @@ pub fn make_active_position(
         pending_state: open_command.pending_state,
     };
 
-    let mut active_state = MtPositionActiveState {
+    let active_state = MtPositionActiveState {
         open_data,
         asset_active_price: get_close_price(asset_price.as_ref(), &open_command.side),
         asset_active_bid_ask: asset_price.as_ref().clone(),
