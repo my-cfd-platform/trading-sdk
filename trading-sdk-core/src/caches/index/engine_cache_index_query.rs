@@ -35,4 +35,24 @@ impl EngineCacheQueryBuilder {
     pub fn with_account(&mut self, account_ident: &str) {
         self.account = Some(account_ident.to_string());
     }
+
+    pub fn filters_count(&self) -> usize {
+        let mut count = 0;
+        if self.base.is_some() {
+            count += 1;
+        }
+        if self.quote.is_some() {
+            count += 1;
+        }
+        if self.collateral.is_some() {
+            count += 1;
+        }
+        if self.client.is_some() {
+            count += 1;
+        }
+        if self.account.is_some() {
+            count += 1;
+        }
+        count
+    }
 }

@@ -94,9 +94,6 @@ impl TradingCacheIndex {
             }
         }
 
-        // println!("Self: {:#?}", self);
-        // println!("Query: {:#?}", query);
-
         let mut to_search = sets
             .into_iter()
             .filter_map(|x| {
@@ -108,12 +105,18 @@ impl TradingCacheIndex {
             })
             .collect::<Vec<_>>();
 
+        let filters = query.filters_count();
+
         if to_search.len() == 0 {
             return HashSet::default();
         }
 
-        if to_search.len() == 0 {
+        if filters == 1 {
             return to_search[0].clone();
+        }
+
+        if to_search.len() == 1 && filters > 1 {
+            return HashSet::default();
         }
 
         let mut result = to_search[0].clone();
@@ -684,5 +687,27 @@ mod tests {
 
         assert!(result1.contains(&"test_id4".to_string()));
         assert!(result2.contains(&"test_id2".to_string()));
+    }
+
+
+    #[test]
+    fn limit_orders_bug_case() {
+        let mut cache = TradingCacheIndex::new();
+        cache.add_index(&TestIndexStruct::new(
+            "test_id1",
+            "EUR",
+            "USD",
+            "USD",
+            "client_ident3",
+            "account_ident",
+        ));
+
+        let mut query1 = EngineCacheQueryBuilder::new();
+        query1.with_base("BTC");
+        query1.with_quote("USD");
+
+        let result1 = cache.query(&query1);
+
+        assert_eq!(0, result1.len());
     }
 }
