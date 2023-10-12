@@ -710,4 +710,64 @@ mod tests {
 
         assert_eq!(0, result1.len());
     }
+
+    #[test]
+    fn limit_orders_bug_case2() {
+        let mut cache = TradingCacheIndex::new();
+        cache.add_index(&TestIndexStruct::new(
+            "test_id1",
+            "EUR",
+            "USD",
+            "USD",
+            "client_ident3",
+            "account_ident",
+        ));
+
+        cache.add_index(&TestIndexStruct::new(
+            "test_id1",
+            "BTC",
+            "USD",
+            "USD",
+            "client_ident3",
+            "account_ident",
+        ));
+
+        let mut query1 = EngineCacheQueryBuilder::new();
+        query1.with_base("BTC");
+        query1.with_quote("USD");
+
+        let result1 = cache.query(&query1);
+
+        assert_eq!(1, result1.len());
+    }
+
+
+    #[test]
+    fn limit_orders_bug_case3() {
+        let mut cache = TradingCacheIndex::new();
+        cache.add_index(&TestIndexStruct::new(
+            "test_id1",
+            "EUR",
+            "USD",
+            "USD",
+            "client_ident3",
+            "account_ident",
+        ));
+
+        cache.add_index(&TestIndexStruct::new(
+            "test_id2",
+            "BTC",
+            "USD",
+            "USD",
+            "client_ident3",
+            "account_ident",
+        ));
+
+        let mut query1 = EngineCacheQueryBuilder::new();
+        query1.with_quote("USD");
+
+        let result1 = cache.query(&query1);
+
+        assert_eq!(2, result1.len());
+    }
 }
