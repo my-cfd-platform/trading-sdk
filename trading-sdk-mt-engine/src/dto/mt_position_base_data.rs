@@ -1,12 +1,13 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MtPositionSide {
     Buy,
     Sell,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionBaseData {
     pub id: String,
     pub trader_id: String,

@@ -1,6 +1,7 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtBidAsk {
     pub asset_pair: String,
     pub bid: f64,

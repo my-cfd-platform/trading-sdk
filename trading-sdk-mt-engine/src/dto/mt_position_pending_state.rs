@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+use serde::{Serialize, Deserialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum MtPositionPendingStateType {
     BuyStop = 0,
     BuyLimit = 1,
@@ -6,7 +8,7 @@ pub enum MtPositionPendingStateType {
     SellLimit = 3,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionPendingState {
     pub desire_price: f64,
     pub position_type: MtPositionPendingStateType,

@@ -1,11 +1,12 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionSwap {
     pub date: DateTimeAsMicroseconds,
     pub amount: f64,
 }
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionSwaps {
     pub swaps: Vec<MtPositionSwap>,
     pub total: f64,

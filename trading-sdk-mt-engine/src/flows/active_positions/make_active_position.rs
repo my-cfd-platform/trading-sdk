@@ -1,4 +1,5 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Serialize, Deserialize};
 
 use crate::{
     get_base_collateral_open_price, get_close_price, get_open_price,
@@ -7,6 +8,7 @@ use crate::{
     MtPositionPendingState, MtPositionSide,
 };
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionOpenCommand {
     pub id: String,
     pub trader_id: String,

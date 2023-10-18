@@ -1,8 +1,9 @@
+use serde::{Serialize, Deserialize};
 use trading_sdk_core::TradingCacheIndexGenerator;
 
 use crate::{MtPositionActiveState, MtPositionBaseData, MtPositionPendingState};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPosition<T> {
     pub state: T,
     pub base_data: MtPositionBaseData,

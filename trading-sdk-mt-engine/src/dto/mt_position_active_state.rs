@@ -1,8 +1,9 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Serialize, Deserialize};
 
 use crate::{MtBidAsk, MtPositionPendingState, MtPositionSwaps};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionActiveStateOpenData {
     pub asset_open_price: f64,
     pub asset_open_bid_ask: MtBidAsk,
@@ -13,7 +14,7 @@ pub struct MtPositionActiveStateOpenData {
     pub pending_state: Option<MtPositionPendingState>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionActiveState {
     pub open_data: MtPositionActiveStateOpenData,
     pub asset_active_price: f64,

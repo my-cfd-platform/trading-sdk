@@ -1,8 +1,9 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
+use serde::{Serialize, Deserialize};
 
 use crate::{MtBidAsk, MtPositionActiveState, MtPositionCloseReason};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPositionClosedState {
     pub active_state: MtPositionActiveState,
     pub asset_close_price: f64,
