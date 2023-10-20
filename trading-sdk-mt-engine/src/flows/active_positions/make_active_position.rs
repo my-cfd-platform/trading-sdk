@@ -5,7 +5,7 @@ use crate::{
     get_base_collateral_open_price, get_close_price, get_open_price,
     get_quote_collateral_close_price, update_position_pl, MtBidAskCache, MtEngineError, MtPosition,
     MtPositionActiveState, MtPositionActiveStateOpenData, MtPositionBaseData,
-    MtPositionPendingState, MtPositionSide,
+    MtPositionPendingState, MtPositionSide, sanitize_sl_tp,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -74,7 +74,7 @@ pub fn make_active_position(
         swaps: crate::MtPositionSwaps::default(),
     };
 
-    let base_data = MtPositionBaseData {
+    let mut base_data = MtPositionBaseData {
         id: open_command.id,
         trader_id: open_command.trader_id,
         account_id: open_command.account_id,
@@ -95,6 +95,8 @@ pub fn make_active_position(
         sl_profit: open_command.sl_profit,
         sl_price: open_command.sl_price,
     };
+
+    sanitize_sl_tp(&mut base_data);
 
     let mut position = MtPosition {
         state: active_state,

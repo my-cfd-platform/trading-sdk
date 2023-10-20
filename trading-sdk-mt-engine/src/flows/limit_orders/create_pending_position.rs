@@ -1,8 +1,8 @@
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
-    get_open_price, get_pending_position_type, MtBidAskCache, MtEngineError, MtPosition,
-    MtPositionPendingState, MtPositionSide, MtPositionBaseData,
+    get_open_price, get_pending_position_type, sanitize_sl_tp, MtBidAskCache, MtEngineError,
+    MtPosition, MtPositionBaseData, MtPositionPendingState, MtPositionSide,
 };
 
 pub struct MtPositionOpenPendingCommand {
@@ -35,14 +35,15 @@ pub fn create_pending_position(
 
     let current_price = get_open_price(asset_price.as_ref(), &command.side);
 
-    let position_type = get_pending_position_type(current_price, command.desired_open_price, &command.side);
+    let position_type =
+        get_pending_position_type(current_price, command.desired_open_price, &command.side);
 
     let state = MtPositionPendingState {
         desire_price: command.desired_open_price,
         position_type,
     };
 
-    let base_data = MtPositionBaseData {
+    let mut base_data = MtPositionBaseData {
         id: command.id,
         trader_id: command.trader_id,
         account_id: command.account_id,
@@ -64,8 +65,9 @@ pub fn create_pending_position(
         sl_price: command.sl_price,
     };
 
+    sanitize_sl_tp(&mut base_data);
 
-    return Ok(MtPosition{
+    return Ok(MtPosition {
         state,
         base_data: base_data,
     });
