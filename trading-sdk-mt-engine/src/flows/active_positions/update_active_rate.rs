@@ -14,15 +14,31 @@ pub fn update_active_position_rate(
         return;
     }
 
-    if (position.base_data.quote == new_bid_ask.base
-        || position.base_data.quote == new_bid_ask.quote)
-        && (position.base_data.base == new_bid_ask.base
-            || position.base_data.base == new_bid_ask.quote)
-    {
+    if is_quote_collateral(
+        new_bid_ask,
+        &position.base_data.quote,
+        &position.base_data.collateral,
+    ) {
         position.state.quote_collateral_active_price =
             get_close_price(new_bid_ask, &position.base_data.side);
         position.state.quote_collateral_active_bid_ask = Some(new_bid_ask.clone());
     }
+}
+
+fn is_quote_collateral(
+    bid_ask: &MtBidAsk,
+    position_quote: &str,
+    position_collateral: &str,
+) -> bool {
+    if bid_ask.base == position_quote && bid_ask.quote == position_collateral {
+        return true;
+    }
+
+    if bid_ask.base == position_collateral && bid_ask.quote == position_quote {
+        return true;
+    }
+
+    return false;
 }
 
 mod test {
