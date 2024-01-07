@@ -25,7 +25,7 @@ fn is_so_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
 
 fn is_sl_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
     if let Some(sl) = position.base_data.sl_profit {
-        return position.state.profit <= sl;
+        return position.state.profit + position.state.swaps.total <= sl;
     }
 
     if let Some(sl) = position.base_data.sl_price {
@@ -40,7 +40,7 @@ fn is_sl_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
 
 fn is_tp_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
     if let Some(tp) = position.base_data.tp_profit {
-        return position.state.profit >= tp;
+        return position.state.profit + position.state.swaps.total >= tp;
     }
 
     if let Some(tp) = position.base_data.tp_price {
@@ -53,10 +53,9 @@ fn is_tp_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
     return false;
 }
 
-fn calculate_position_margin_percent(
-    position: &MtPosition<MtPositionActiveState>,
-) -> f64 {
-    let margin = position.state.profit + position.base_data.invest_amount;
+fn calculate_position_margin_percent(position: &MtPosition<MtPositionActiveState>) -> f64 {
+    let margin =
+        position.state.profit + position.base_data.invest_amount + position.state.swaps.total;
     return margin / position.base_data.invest_amount * 100.0;
 }
 
@@ -359,7 +358,10 @@ mod tests {
         update_position_pl(&mut position);
         let cr = super::get_close_reason(&position).unwrap();
 
-        assert_eq!(format!("{:.2}", position.state.profit), (-18.71).to_string());
+        assert_eq!(
+            format!("{:.2}", position.state.profit),
+            (-18.71).to_string()
+        );
         assert_eq!(matches!(cr, MtPositionCloseReason::StopLoss), true);
     }
 
@@ -432,7 +434,10 @@ mod tests {
 
         update_position_pl(&mut position);
         let cr = super::get_close_reason(&position).unwrap();
-        assert_eq!(format!("{:.2}", position.state.profit), (-18.71).to_string());
+        assert_eq!(
+            format!("{:.2}", position.state.profit),
+            (-18.71).to_string()
+        );
         assert_eq!(matches!(cr, MtPositionCloseReason::StopOut), true);
     }
 }
