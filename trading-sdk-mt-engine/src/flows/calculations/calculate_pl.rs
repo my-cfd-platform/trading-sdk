@@ -25,7 +25,7 @@ pub fn update_unrealized_pl(position: &mut MtPosition<MtPositionActiveState>) {
         false => instrument_profit,
     };
 
-    position.state.profit = collateral_profit * side_coefficient;
+    position.state.profit = collateral_profit * side_coefficient + position.state.swaps.total;
 }
 
 pub fn update_collateral_unrealized_pl(position: &mut MtPosition<MtPositionActiveState>) {
@@ -47,7 +47,7 @@ pub fn update_collateral_unrealized_pl(position: &mut MtPosition<MtPositionActiv
     let price_change =
         position.state.asset_active_price - position.state.open_data.asset_open_price;
 
-    let base_profit = investment_volume * price_change;
+    let base_profit = investment_volume * price_change + position.state.swaps.total;;
 
     //account currency profit
 
