@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use rust_extensions::date_time::DateTimeAsMicroseconds;
 
 use crate::{
@@ -23,6 +25,9 @@ pub struct MtPositionOpenPendingCommand {
     pub sl_profit: Option<f64>,
     pub sl_price: Option<f64>,
     pub desired_open_price: f64,
+    pub margin_call_percent: Option<f64>,
+    pub topping_up_percent: Option<f64>,
+    pub metadata: Option<HashMap<String, String>>,
 }
 
 pub fn create_pending_position(
@@ -63,6 +68,9 @@ pub fn create_pending_position(
         tp_price: command.tp_price,
         sl_profit: command.sl_profit,
         sl_price: command.sl_price,
+        topping_up_percent: command.topping_up_percent,
+        metadata: command.metadata,
+        margin_call_percent: command.margin_call_percent
     };
 
     sanitize_sl_tp(&mut base_data);

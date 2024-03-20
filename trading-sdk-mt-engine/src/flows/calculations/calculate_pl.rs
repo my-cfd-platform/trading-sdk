@@ -49,8 +49,6 @@ pub fn update_collateral_unrealized_pl(position: &mut MtPosition<MtPositionActiv
 
     let base_profit = investment_volume * price_change;
 
-    //account currency profit
-
     let inverted_quote = position
         .state
         .quote_collateral_active_bid_ask
@@ -69,7 +67,8 @@ pub fn update_collateral_unrealized_pl(position: &mut MtPosition<MtPositionActiv
         MtPositionSide::Sell => -1.0,
     };
 
-    position.state.profit = collateral_currency_profit * side_coefficient + position.state.swaps.total;
+    position.state.profit =
+        collateral_currency_profit * side_coefficient + position.state.swaps.total;
 }
 
 pub fn update_position_pl(position: &mut MtPosition<MtPositionActiveState>) {
@@ -122,6 +121,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -151,6 +153,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false
         };
 
         let mut position = MtPosition {
@@ -194,6 +198,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -223,6 +230,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false
         };
 
         let mut position = MtPosition {
@@ -232,9 +241,11 @@ mod tests {
 
         update_position_pl(&mut position);
 
-        assert_eq!(format!("{:.4}", position.state.profit), 332.1478.to_string());
+        assert_eq!(
+            format!("{:.4}", position.state.profit),
+            332.1478.to_string()
+        );
     }
-
 
     #[test]
     fn calculate_pl_3() {
@@ -256,8 +267,6 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-
-
         let base_data = MtPositionBaseData {
             id: "id".to_string(),
             trader_id: "trader_id".to_string(),
@@ -278,12 +287,18 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
             asset_open_price: get_open_price(&asset_bid_ask, &crate::MtPositionSide::Buy),
             asset_open_bid_ask: asset_bid_ask.clone(),
-            base_collateral_open_price: get_open_price(&base_collateral_bid_ask, &crate::MtPositionSide::Buy),
+            base_collateral_open_price: get_open_price(
+                &base_collateral_bid_ask,
+                &crate::MtPositionSide::Buy,
+            ),
             base_collateral_open_bid_ask: Some(base_collateral_bid_ask.clone()),
             open_process_id: "process".to_string(),
             open_date: DateTimeAsMicroseconds::now(),
@@ -312,10 +327,15 @@ mod tests {
             open_data,
             asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
             asset_active_bid_ask: close_asset_bid_ask,
-            quote_collateral_active_price: get_close_price(&close_quote_collateral_bid_ask, &crate::MtPositionSide::Buy),
+            quote_collateral_active_price: get_close_price(
+                &close_quote_collateral_bid_ask,
+                &crate::MtPositionSide::Buy,
+            ),
             quote_collateral_active_bid_ask: Some(close_quote_collateral_bid_ask.clone()),
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false
         };
 
         let mut position = MtPosition {
@@ -325,6 +345,9 @@ mod tests {
 
         update_position_pl(&mut position);
 
-        assert_eq!(format!("{:.4}", position.state.profit), (-240.2305).to_string());
+        assert_eq!(
+            format!("{:.4}", position.state.profit),
+            (-240.2305).to_string()
+        );
     }
 }

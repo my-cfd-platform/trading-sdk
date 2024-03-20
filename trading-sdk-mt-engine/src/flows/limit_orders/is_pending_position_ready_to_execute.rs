@@ -27,8 +27,8 @@ mod tests {
     use rust_extensions::date_time::DateTimeAsMicroseconds;
 
     use crate::{
-        get_close_price, get_pending_position_type, MtBidAsk, MtPosition, MtPositionBaseData,
-        MtPositionPendingState, is_ready_to_execute_pending_position, MtPositionPendingStateType,
+        get_close_price, get_pending_position_type, is_ready_to_execute_pending_position, MtBidAsk,
+        MtPosition, MtPositionBaseData, MtPositionPendingState, MtPositionPendingStateType,
     };
 
     #[test]
@@ -64,6 +64,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            margin_call_percent: None,
+            topping_up_percent: None,
+            metadata: None,
         };
 
         let state: MtPositionPendingState = MtPositionPendingState {
@@ -75,7 +78,10 @@ mod tests {
             ),
         };
 
-        let position = MtPosition { state: state.clone(), base_data };
+        let position = MtPosition {
+            state: state.clone(),
+            base_data,
+        };
 
         let not_execute_bid_ask = MtBidAsk {
             asset_pair: "EURUSD".to_string(),
@@ -95,10 +101,22 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        assert_eq!(true, matches!(state.position_type, MtPositionPendingStateType::BuyStop));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &current_price));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &not_execute_bid_ask));
-        assert_eq!(true, is_ready_to_execute_pending_position(&position, &execute_bid_ask));
+        assert_eq!(
+            true,
+            matches!(state.position_type, MtPositionPendingStateType::BuyStop)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &current_price)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &not_execute_bid_ask)
+        );
+        assert_eq!(
+            true,
+            is_ready_to_execute_pending_position(&position, &execute_bid_ask)
+        );
     }
 
     #[test]
@@ -134,6 +152,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            margin_call_percent: None,
+            topping_up_percent: None,
+            metadata: None,
         };
 
         let state: MtPositionPendingState = MtPositionPendingState {
@@ -145,7 +166,10 @@ mod tests {
             ),
         };
 
-        let position = MtPosition { state: state.clone(), base_data };
+        let position = MtPosition {
+            state: state.clone(),
+            base_data,
+        };
 
         let not_execute_bid_ask = MtBidAsk {
             asset_pair: "EURUSD".to_string(),
@@ -165,12 +189,23 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        assert_eq!(true, matches!(state.position_type, MtPositionPendingStateType::BuyLimit));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &current_price));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &not_execute_bid_ask));
-        assert_eq!(true, is_ready_to_execute_pending_position(&position, &execute_bid_ask));
+        assert_eq!(
+            true,
+            matches!(state.position_type, MtPositionPendingStateType::BuyLimit)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &current_price)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &not_execute_bid_ask)
+        );
+        assert_eq!(
+            true,
+            is_ready_to_execute_pending_position(&position, &execute_bid_ask)
+        );
     }
-
 
     #[test]
     fn text_sell_limit() {
@@ -205,6 +240,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            margin_call_percent: None,
+            topping_up_percent: None,
+            metadata: None,
         };
 
         let state: MtPositionPendingState = MtPositionPendingState {
@@ -216,7 +254,10 @@ mod tests {
             ),
         };
 
-        let position = MtPosition { state: state.clone(), base_data };
+        let position = MtPosition {
+            state: state.clone(),
+            base_data,
+        };
 
         let not_execute_bid_ask = MtBidAsk {
             asset_pair: "EURUSD".to_string(),
@@ -236,10 +277,22 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        assert_eq!(true, matches!(state.position_type, MtPositionPendingStateType::SellLimit));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &current_price));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &not_execute_bid_ask));
-        assert_eq!(true, is_ready_to_execute_pending_position(&position, &execute_bid_ask));
+        assert_eq!(
+            true,
+            matches!(state.position_type, MtPositionPendingStateType::SellLimit)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &current_price)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &not_execute_bid_ask)
+        );
+        assert_eq!(
+            true,
+            is_ready_to_execute_pending_position(&position, &execute_bid_ask)
+        );
     }
 
     #[test]
@@ -275,6 +328,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            margin_call_percent: None,
+            topping_up_percent: None,
+            metadata: None,
         };
 
         let state: MtPositionPendingState = MtPositionPendingState {
@@ -286,7 +342,10 @@ mod tests {
             ),
         };
 
-        let position = MtPosition { state: state.clone(), base_data };
+        let position = MtPosition {
+            state: state.clone(),
+            base_data,
+        };
 
         let not_execute_bid_ask = MtBidAsk {
             asset_pair: "EURUSD".to_string(),
@@ -306,9 +365,21 @@ mod tests {
             date: DateTimeAsMicroseconds::now(),
         };
 
-        assert_eq!(true, matches!(state.position_type, MtPositionPendingStateType::SellStop));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &current_price));
-        assert_eq!(false, is_ready_to_execute_pending_position(&position, &not_execute_bid_ask));
-        assert_eq!(true, is_ready_to_execute_pending_position(&position, &execute_bid_ask));
+        assert_eq!(
+            true,
+            matches!(state.position_type, MtPositionPendingStateType::SellStop)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &current_price)
+        );
+        assert_eq!(
+            false,
+            is_ready_to_execute_pending_position(&position, &not_execute_bid_ask)
+        );
+        assert_eq!(
+            true,
+            is_ready_to_execute_pending_position(&position, &execute_bid_ask)
+        );
     }
 }

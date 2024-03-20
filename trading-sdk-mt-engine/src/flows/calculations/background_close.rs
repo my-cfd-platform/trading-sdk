@@ -1,4 +1,4 @@
-use crate::{MtPosition, MtPositionActiveState, MtPositionCloseReason};
+use crate::{get_position_total_invest, MtPosition, MtPositionActiveState, MtPositionCloseReason};
 
 pub fn get_close_reason(
     position: &MtPosition<MtPositionActiveState>,
@@ -54,9 +54,8 @@ fn is_tp_triggered(position: &MtPosition<MtPositionActiveState>) -> bool {
 }
 
 fn calculate_position_margin_percent(position: &MtPosition<MtPositionActiveState>) -> f64 {
-    let margin =
-        position.state.profit + position.base_data.invest_amount;
-    return margin / position.base_data.invest_amount * 100.0;
+    let margin = position.state.profit + get_position_total_invest(position);
+    return margin / get_position_total_invest(position) * 100.0;
 }
 
 #[cfg(test)]
@@ -99,6 +98,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -128,6 +130,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
         };
 
         let mut position = MtPosition {
@@ -173,6 +177,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -202,6 +209,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
         };
 
         let mut position = MtPosition {
@@ -246,6 +255,9 @@ mod tests {
             tp_price: Some(1.0697),
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -275,6 +287,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
         };
 
         let mut position = MtPosition {
@@ -320,6 +334,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: Some(1.0697),
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -349,6 +366,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
         };
         let mut position = MtPosition {
             state: active_state,
@@ -396,6 +415,9 @@ mod tests {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -425,6 +447,8 @@ mod tests {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
         };
 
         let mut position = MtPosition {
@@ -433,6 +457,174 @@ mod tests {
         };
 
         update_position_pl(&mut position);
+        let cr = super::get_close_reason(&position).unwrap();
+        assert_eq!(
+            format!("{:.2}", position.state.profit),
+            (-18.71).to_string()
+        );
+        assert_eq!(matches!(cr, MtPositionCloseReason::StopOut), true);
+    }
+
+    #[test]
+    fn test_so_profit_no_close_with_topping_up() {
+        let asset_bid_ask = MtBidAsk {
+            asset_pair: "EURUSD".to_string(),
+            bid: 1.0688,
+            ask: 1.0688,
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            date: DateTimeAsMicroseconds::now(),
+        };
+
+        let base_data = MtPositionBaseData {
+            id: "id".to_string(),
+            trader_id: "trader_id".to_string(),
+            account_id: "account_id".to_string(),
+            asset_pair: "EURUSD".to_string(),
+            side: crate::MtPositionSide::Sell,
+            invest_amount: 100.0,
+            leverage: 200.0,
+            stop_out_percent: 18.0,
+            create_process_id: "process".to_string(),
+            crate_date: DateTimeAsMicroseconds::now(),
+            last_update_process_id: "process".to_string(),
+            last_update_date: DateTimeAsMicroseconds::now(),
+            collateral: "USD".to_string(),
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            tp_profit: None,
+            tp_price: None,
+            sl_profit: None,
+            sl_price: None,
+            metadata: None,
+            margin_call_percent: Some(20.0),
+            topping_up_percent: Some(40.0),
+        };
+
+        let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
+            asset_open_price: get_open_price(&asset_bid_ask, &crate::MtPositionSide::Buy),
+            asset_open_bid_ask: asset_bid_ask.clone(),
+            base_collateral_open_price: get_open_price(&asset_bid_ask, &crate::MtPositionSide::Buy),
+            base_collateral_open_bid_ask: Some(asset_bid_ask.clone()),
+            open_process_id: "process".to_string(),
+            open_date: DateTimeAsMicroseconds::now(),
+            pending_state: None,
+        };
+
+        let close_asset_bid_ask = MtBidAsk {
+            asset_pair: "EURUSD".to_string(),
+            bid: 1.0698,
+            ask: 1.0698,
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            date: DateTimeAsMicroseconds::now(),
+        };
+
+        let active_state = MtPositionActiveState {
+            open_data,
+            asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
+            asset_active_bid_ask: close_asset_bid_ask,
+            quote_collateral_active_price: 1.0,
+            quote_collateral_active_bid_ask: None,
+            profit: 0.0,
+            swaps: MtPositionSwaps::default(),
+            topping_up: Some(120.0),
+            is_margin_call_hit: false,
+        };
+
+        let mut position = MtPosition {
+            state: active_state,
+            base_data,
+        };
+
+        update_position_pl(&mut position);
+        let cr = super::get_close_reason(&position);
+        assert_eq!(
+            format!("{:.2}", position.state.profit),
+            (-18.71).to_string()
+        );
+        assert_eq!(matches!(cr, None), true);
+    }
+
+    #[test]
+    fn test_so_profit_close_with_topping_up() {
+        let asset_bid_ask = MtBidAsk {
+            asset_pair: "EURUSD".to_string(),
+            bid: 1.0688,
+            ask: 1.0688,
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            date: DateTimeAsMicroseconds::now(),
+        };
+
+        let base_data = MtPositionBaseData {
+            id: "id".to_string(),
+            trader_id: "trader_id".to_string(),
+            account_id: "account_id".to_string(),
+            asset_pair: "EURUSD".to_string(),
+            side: crate::MtPositionSide::Sell,
+            invest_amount: 100.0,
+            leverage: 200.0,
+            stop_out_percent: 18.0,
+            create_process_id: "process".to_string(),
+            crate_date: DateTimeAsMicroseconds::now(),
+            last_update_process_id: "process".to_string(),
+            last_update_date: DateTimeAsMicroseconds::now(),
+            collateral: "USD".to_string(),
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            tp_profit: None,
+            tp_price: None,
+            sl_profit: None,
+            sl_price: None,
+            topping_up_percent: None,
+            metadata: None,
+            margin_call_percent: None,
+        };
+
+        let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
+            asset_open_price: get_open_price(&asset_bid_ask, &crate::MtPositionSide::Buy),
+            asset_open_bid_ask: asset_bid_ask.clone(),
+            base_collateral_open_price: get_open_price(&asset_bid_ask, &crate::MtPositionSide::Buy),
+            base_collateral_open_bid_ask: Some(asset_bid_ask.clone()),
+            open_process_id: "process".to_string(),
+            open_date: DateTimeAsMicroseconds::now(),
+            pending_state: None,
+        };
+
+        let close_asset_bid_ask = MtBidAsk {
+            asset_pair: "EURUSD".to_string(),
+            bid: 1.0698,
+            ask: 1.0698,
+            base: "EUR".to_string(),
+            quote: "USD".to_string(),
+            date: DateTimeAsMicroseconds::now(),
+        };
+
+        let active_state = MtPositionActiveState {
+            open_data,
+            asset_active_price: get_close_price(&close_asset_bid_ask, &base_data.side),
+            asset_active_bid_ask: close_asset_bid_ask,
+            quote_collateral_active_price: 1.0,
+            quote_collateral_active_bid_ask: None,
+            profit: 0.0,
+            swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false,
+        };
+
+        let mut position = MtPosition {
+            state: active_state,
+            base_data,
+        };
+
+        update_position_pl(&mut position);
+
+        position.base_data.invest_amount = 1.0;
+        position.base_data.topping_up_percent = Some(100.0);
+        position.base_data.margin_call_percent = Some(40.0);
+        position.state.topping_up = Some(99.0);
+
         let cr = super::get_close_reason(&position).unwrap();
         assert_eq!(
             format!("{:.2}", position.state.profit),

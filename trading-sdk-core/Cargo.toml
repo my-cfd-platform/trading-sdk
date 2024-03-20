@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 trading-sdk-abstractions ={ path = "../trading-sdk-abstractions" }
 stopwatch = "0.0.7"
+metrics = "*"

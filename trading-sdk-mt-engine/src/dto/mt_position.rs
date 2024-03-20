@@ -1,7 +1,7 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use trading_sdk_core::TradingCacheIndexGenerator;
 
-use crate::{MtPositionActiveState, MtPositionBaseData, MtPositionPendingState};
+use crate::{MtPositionActiveState, MtPositionBaseData, MtPositionPendingState, TestEntity};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MtPosition<T> {
@@ -58,5 +58,14 @@ impl TradingCacheIndexGenerator for MtPosition<MtPositionPendingState> {
 
     fn get_account_identification_index(&self) -> Option<String> {
         Some(self.base_data.account_id.clone())
+    }
+}
+
+impl TestEntity for MtPosition<MtPositionActiveState> {
+    fn generate_test_entity() -> Self {
+        Self {
+            state: MtPositionActiveState::generate_test_entity(),
+            base_data: MtPositionBaseData::generate_test_entity(),
+        }
     }
 }

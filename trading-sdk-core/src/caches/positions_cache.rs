@@ -3,12 +3,14 @@ use std::collections::HashMap;
 use crate::{EngineCacheQueryBuilder, TradingCacheIndex, TradingCacheIndexGenerator};
 pub struct PositionsCache<T: TradingCacheIndexGenerator> {
     pub indexes: TradingCacheIndex,
+    pub identifier: String,
     pub positions: HashMap<String, T>,
 }
 
 impl<T: TradingCacheIndexGenerator> PositionsCache<T> {
-    pub fn new() -> Self {
+    pub fn new(identifier: String) -> Self {
         Self {
+            identifier,
             indexes: TradingCacheIndex::new(),
             positions: HashMap::new(),
         }
@@ -19,11 +21,13 @@ impl<T: TradingCacheIndexGenerator> PositionsCache<T> {
     }
 
     pub fn add_position(&mut self, position: T) {
+        metrics::gauge!("cache_positions_amount", "ident" => self.identifier.clone()).increment(1);
         self.indexes.add_index(&position);
         self.positions.insert(position.get_id(), position);
     }
 
     pub fn remove_position(&mut self, id: &str) -> Option<T> {
+        metrics::gauge!("cache_positions_amount", "ident" => self.identifier.clone()).decrement(1);
         self.indexes.remove_index(id);
         self.positions.remove(id)
     }
@@ -57,6 +61,9 @@ impl<T: TradingCacheIndexGenerator> PositionsCache<T> {
                 }
             }
         }
+
+        metrics::gauge!("cache_positions_amount", "ident" => self.identifier.clone())
+            .set(self.positions.len() as f64);
 
         return to_return;
     }

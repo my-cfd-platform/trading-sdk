@@ -40,13 +40,13 @@ fn is_quote_collateral(
 
     return false;
 }
-
+#[cfg(test)]
 mod test {
     use rust_extensions::date_time::DateTimeAsMicroseconds;
 
     use crate::{
-        get_open_price, update_active_position_rate, update_position_pl, MtBidAsk, MtPosition,
-        MtPositionActiveState, MtPositionActiveStateOpenData, MtPositionBaseData, MtPositionSwaps,
+        get_open_price, update_active_position_rate, MtBidAsk, MtPosition, MtPositionActiveState,
+        MtPositionActiveStateOpenData, MtPositionBaseData, MtPositionSwaps,
     };
 
     #[test]
@@ -80,6 +80,9 @@ mod test {
             tp_price: None,
             sl_profit: None,
             sl_price: None,
+            margin_call_percent: None,
+            topping_up_percent: None,
+            metadata: None,
         };
 
         let open_data: MtPositionActiveStateOpenData = MtPositionActiveStateOpenData {
@@ -100,6 +103,8 @@ mod test {
             quote_collateral_active_bid_ask: None,
             profit: 0.0,
             swaps: MtPositionSwaps::default(),
+            topping_up: None,
+            is_margin_call_hit: false
         };
 
         let mut position = MtPosition {

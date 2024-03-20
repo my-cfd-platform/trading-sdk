@@ -3,8 +3,7 @@ use rust_extensions::date_time::DateTimeAsMicroseconds;
 use crate::{
     get_base_collateral_open_price, get_close_price, get_open_price,
     get_quote_collateral_close_price, MtBidAskCache, MtEngineError, MtPosition,
-    MtPositionActiveState, MtPositionActiveStateOpenData,
-    MtPositionPendingState,
+    MtPositionActiveState, MtPositionActiveStateOpenData, MtPositionPendingState,
 };
 
 pub fn execute_pending_position(
@@ -35,8 +34,8 @@ pub fn execute_pending_position(
     let open_date = MtPositionActiveStateOpenData {
         asset_open_price: get_open_price(asset_price.as_ref(), &pending_position.base_data.side),
         asset_open_bid_ask: asset_price.as_ref().clone(),
-        base_collateral_open_price: base_collateral_open_price,
-        base_collateral_open_bid_ask: base_collateral_open_bid_ask,
+        base_collateral_open_price,
+        base_collateral_open_bid_ask,
         open_process_id: process_id.clone(),
         open_date: DateTimeAsMicroseconds::now(),
         pending_state: Some(pending_position.state),
@@ -50,6 +49,8 @@ pub fn execute_pending_position(
         quote_collateral_active_bid_ask: quote_collateral_close_bid_ask,
         profit: 0.0,
         swaps: crate::MtPositionSwaps::default(),
+        topping_up: None,
+        is_margin_call_hit: false
     };
 
     return Ok(MtPosition {

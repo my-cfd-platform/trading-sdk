@@ -1,11 +1,13 @@
+use std::collections::HashMap;
+
 use rust_extensions::date_time::DateTimeAsMicroseconds;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     get_base_collateral_open_price, get_close_price, get_open_price,
-    get_quote_collateral_close_price, update_position_pl, MtBidAskCache, MtEngineError, MtPosition,
-    MtPositionActiveState, MtPositionActiveStateOpenData, MtPositionBaseData,
-    MtPositionPendingState, MtPositionSide, sanitize_sl_tp,
+    get_quote_collateral_close_price, sanitize_sl_tp, update_position_pl, MtBidAskCache,
+    MtEngineError, MtPosition, MtPositionActiveState, MtPositionActiveStateOpenData,
+    MtPositionBaseData, MtPositionPendingState, MtPositionSide,
 };
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -27,6 +29,9 @@ pub struct MtPositionOpenCommand {
     pub tp_price: Option<f64>,
     pub sl_profit: Option<f64>,
     pub sl_price: Option<f64>,
+    pub margin_call_percent: Option<f64>,
+    pub topping_up_percent: Option<f64>,
+    pub metadata: Option<HashMap<String, String>>,
 }
 
 pub fn make_active_position(
@@ -72,6 +77,8 @@ pub fn make_active_position(
         quote_collateral_active_bid_ask: quote_collateral_close_bid_ask,
         profit: 0.0,
         swaps: crate::MtPositionSwaps::default(),
+        topping_up: None,
+        is_margin_call_hit: false
     };
 
     let mut base_data = MtPositionBaseData {
@@ -94,6 +101,9 @@ pub fn make_active_position(
         tp_price: open_command.tp_price,
         sl_profit: open_command.sl_profit,
         sl_price: open_command.sl_price,
+        topping_up_percent: open_command.topping_up_percent,
+        metadata: open_command.metadata,
+        margin_call_percent: open_command.margin_call_percent,
     };
 
     sanitize_sl_tp(&mut base_data);
