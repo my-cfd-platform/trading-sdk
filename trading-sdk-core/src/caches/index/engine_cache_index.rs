@@ -201,8 +201,8 @@ mod tests {
     fn test_search_by_client_ident_single() {
         let mut cache = TradingCacheIndex::new();
 
-        let mut query = EngineCacheQueryBuilder::new();
-        query.with_client("client_ident");
+        let query = EngineCacheQueryBuilder::new()
+        .with_client("client_ident");
 
         cache.add_index(&TestIndexStruct::new(
             "test_id1",
@@ -297,14 +297,11 @@ mod tests {
             "account_ident",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_client("client_ident");
+        let query1 = EngineCacheQueryBuilder::new().with_client("client_ident");
 
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_client("client_ident2");
+        let query2 = EngineCacheQueryBuilder::new().with_client("client_ident2");
 
-        let mut query3 = EngineCacheQueryBuilder::new();
-        query3.with_client("client_ident3");
+        let query3 = EngineCacheQueryBuilder::new().with_client("client_ident3");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -328,8 +325,7 @@ mod tests {
     fn test_search_by_client_account_single() {
         let mut cache = TradingCacheIndex::new();
 
-        let mut query = EngineCacheQueryBuilder::new();
-        query.with_account("account_ident");
+        let query = EngineCacheQueryBuilder::new().with_account("account_ident");
 
         cache.add_index(&TestIndexStruct::new(
             "test_id1",
@@ -424,14 +420,11 @@ mod tests {
             "account_ident3",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_account("account_ident");
+        let query1 = EngineCacheQueryBuilder::new().with_account("account_ident");
 
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_account("account_ident2");
+        let query2 = EngineCacheQueryBuilder::new().with_account("account_ident2");
 
-        let mut query3 = EngineCacheQueryBuilder::new();
-        query3.with_account("account_ident3");
+        let query3 = EngineCacheQueryBuilder::new().with_account("account_ident3");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -508,13 +501,13 @@ mod tests {
             "account_ident3",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_base("base3");
-        query1.with_account("account_ident3");
+        let query1 = EngineCacheQueryBuilder::new()
+            .with_base("base3")
+            .with_account("account_ident3");
 
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_base("base2");
-        query2.with_account("account_ident2");
+        let query2 = EngineCacheQueryBuilder::new()
+            .with_base("base2")
+            .with_account("account_ident2");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -558,16 +551,16 @@ mod tests {
         ));
 
         //1 - test_id1
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_base("base");
-        query1.with_quote("quote3");
-        query1.with_account("account_ident");
+        let query1 = EngineCacheQueryBuilder::new()
+            .with_base("base")
+            .with_quote("quote3")
+            .with_account("account_ident");
 
         //2 - test_id1, test_id3
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_collateral("collateral");
-        query2.with_base("base");
-        query2.with_account("account_ident");
+        let query2 = EngineCacheQueryBuilder::new()
+            .with_collateral("collateral")
+            .with_base("base")
+            .with_account("account_ident");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -637,14 +630,11 @@ mod tests {
             "account_ident",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_client("client_ident");
+        let query1 = EngineCacheQueryBuilder::new().with_client("client_ident");
 
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_client("client_ident2");
+        let query2 = EngineCacheQueryBuilder::new().with_client("client_ident2");
 
-        let mut query3 = EngineCacheQueryBuilder::new();
-        query3.with_client("client_ident3");
+        let query3 = EngineCacheQueryBuilder::new().with_client("client_ident3");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -668,14 +658,11 @@ mod tests {
         cache.remove_index("test_id5");
         cache.remove_index("test_id6");
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_client("client_ident");
+        let query1 = EngineCacheQueryBuilder::new().with_client("client_ident");
 
-        let mut query2 = EngineCacheQueryBuilder::new();
-        query2.with_client("client_ident2");
+        let query2 = EngineCacheQueryBuilder::new().with_client("client_ident2");
 
-        let mut query3 = EngineCacheQueryBuilder::new();
-        query3.with_client("client_ident3");
+        let query3 = EngineCacheQueryBuilder::new().with_client("client_ident3");
 
         let result1 = cache.query(&query1);
         let result2 = cache.query(&query2);
@@ -689,7 +676,6 @@ mod tests {
         assert!(result2.contains(&"test_id2".to_string()));
     }
 
-
     #[test]
     fn limit_orders_bug_case() {
         let mut cache = TradingCacheIndex::new();
@@ -702,9 +688,9 @@ mod tests {
             "account_ident",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_base("BTC");
-        query1.with_quote("USD");
+        let query1 = EngineCacheQueryBuilder::new()
+            .with_base("BTC")
+            .with_quote("USD");
 
         let result1 = cache.query(&query1);
 
@@ -732,15 +718,14 @@ mod tests {
             "account_ident",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_base("BTC");
-        query1.with_quote("USD");
+        let query1 = EngineCacheQueryBuilder::new()
+            .with_base("BTC")
+            .with_quote("USD");
 
         let result1 = cache.query(&query1);
 
         assert_eq!(1, result1.len());
     }
-
 
     #[test]
     fn limit_orders_bug_case3() {
@@ -763,8 +748,7 @@ mod tests {
             "account_ident",
         ));
 
-        let mut query1 = EngineCacheQueryBuilder::new();
-        query1.with_quote("USD");
+        let query1 = EngineCacheQueryBuilder::new().with_quote("USD");
 
         let result1 = cache.query(&query1);
 
