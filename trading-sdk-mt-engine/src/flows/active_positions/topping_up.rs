@@ -15,8 +15,10 @@ pub fn return_topping_up(topping_up_amount: f64, position: &mut MtPosition<MtPos
     if let Some(topping_up) = &position.state.topping_up {
         if topping_up < &topping_up_amount {
             panic!(
-                "Topping up amount is less than requested, cant return for position: {}",
-                position.base_data.id
+                "Topping up amount is less than requested, cant return for position: {}. position_amount: {}, amount: {}",
+                position.base_data.id,
+                topping_up,
+                topping_up_amount
             )
         }
 
