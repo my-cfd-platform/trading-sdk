@@ -2,10 +2,9 @@ use crate::{MtPosition, MtPositionActiveState};
 
 pub fn update_margin_call_hit(position: &mut MtPosition<MtPositionActiveState>) -> bool {
     let is_hit = is_margin_call_hit(position);
-    let is_change = is_hit != position.state.is_margin_call_hit;
     position.state.is_margin_call_hit = is_hit;
 
-    is_change
+    is_hit
 }
 
 pub fn is_margin_call_hit(position: &MtPosition<MtPositionActiveState>) -> bool {

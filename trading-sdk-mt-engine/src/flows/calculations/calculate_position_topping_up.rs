@@ -27,7 +27,7 @@ pub fn can_return_topping_up_funds(position: &MtPosition<MtPositionActiveState>)
         / (get_position_total_invest(position) - topping_up_amount)
         * 100.0;
 
-    return 100.0 - free_margin_without_last_topping_up_percent <= margin_call;
+    return 100.0 - free_margin_without_last_topping_up_percent < margin_call;
 }
 
 #[cfg(test)]
